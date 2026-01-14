@@ -36,11 +36,21 @@ public class CalculatorUnitTests
     }
 
     [TestMethod]
-    public void NegativeNumbers_AreSummed()
+    public void NegativeNumber_ShouldThrowException_ContainingNegative()
     {
         var value = "4,-3";
-        var result = _calculator.Add(value);
-        Assert.AreEqual("1", result);
+        var ex = Assert.ThrowsException<ArgumentException>(() => _calculator.Add(value));
+        StringAssert.Contains(ex.Message, "-3");
+    }
+
+    [TestMethod]
+    public void MultipleNegativeNumbers_ShouldThrowException_ContainingAllNegatives()
+    {
+        var value = "-1,-2,-3";
+        var ex = Assert.ThrowsException<ArgumentException>(() => _calculator.Add(value));
+        StringAssert.Contains(ex.Message, "-1");
+        StringAssert.Contains(ex.Message, "-2");
+        StringAssert.Contains(ex.Message, "-3");
     }
 
     [TestMethod]
