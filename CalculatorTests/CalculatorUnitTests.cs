@@ -44,10 +44,19 @@ public class CalculatorUnitTests
     }
 
     [TestMethod]
-    public void MoreThanTwoNumbers_ThrowsException()
+    public void MoreThanTwoNumbers_ShouldAddThemUpAll()
     {
         var value = "1,2,3";
-        Assert.ThrowsException<ArgumentException>(() => _calculator.Add(value));
+        var result = _calculator.Add(value);
+        Assert.AreEqual("6", result);
+    }
+
+    [TestMethod]
+    public void MoreThanTwoNumbers_Sample2_ShouldAddThemUpAll()
+    {
+        var value = "1,2,3,4,5,6,7,8,9,10,11,12";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("78", result);
     }
 
     [TestMethod]

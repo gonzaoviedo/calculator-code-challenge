@@ -9,9 +9,6 @@ public class Calculator
 
         var parts = input.Split(',');
 
-        if (parts.Length > 2)
-            throw new ArgumentException("A maximum of two numbers is supported.");
-
         var sum = 0;
 
         foreach (var part in parts)
