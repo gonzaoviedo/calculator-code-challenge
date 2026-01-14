@@ -229,4 +229,29 @@ public class CalculatorUnitTests
         var result = _calculator.Add(value);
         Assert.AreEqual("10", result);
     }
+
+    [TestMethod]
+    public void MultipleCustomDelimiters_AnyLength_AreSupported()
+    {
+        var value = "//[*][!!][r9r]\n11r9r22*hh*33!!44";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("110", result);
+    }
+
+    [TestMethod]
+    public void MultipleCustomDelimiters_AnyLength_AreSupported_AnotherTest()
+    {
+        var value = "//[*][!!][r9r][#]\n11r9r22*hh*33!!44#1";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("111", result);
+    }
+
+    [TestMethod]
+    public void MultipleCustomDelimiters_WithNegatives_ThrowsAndListsAll()
+    {
+        var value = "//[;][***][#]\n-1;2***-3#4";
+        var ex = Assert.ThrowsException<ArgumentException>(() => _calculator.Add(value));
+        StringAssert.Contains(ex.Message, "-1");
+        StringAssert.Contains(ex.Message, "-3");
+    }
 }

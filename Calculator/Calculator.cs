@@ -15,9 +15,9 @@ public class Calculator
         var delimiters = new List<string>(BaseDelimiters);
         var numbersPortion = input;
 
-        if (TryParseCustomDelimiter(input, out var customDelimiter, out var withoutHeader))
+        if (TryParseCustomDelimiters(input, out var customDelimiters, out var withoutHeader))
         {
-            delimiters.Add(customDelimiter);
+            delimiters.AddRange(customDelimiters);
             numbersPortion = withoutHeader;
         }
 
@@ -28,32 +28,50 @@ public class Calculator
         return sum.ToString();
     }
 
-    private static bool TryParseCustomDelimiter(string input, out string delimiter, out string numbersPortion)
+    private static bool TryParseCustomDelimiters(string input, out List<string> delimiters, out string numbersPortion)
     {
-        delimiter = string.Empty;
+        delimiters = new List<string>();
         numbersPortion = input;
 
         if (!input.StartsWith("//"))
             return false;
 
-        // Format 1: //[{delimiter}]\n{numbers}  (delimiter of any length)
-        if (input.StartsWith("//["))
-        {
-            var closingBracketIndex = input.IndexOf(']', 3);
-            if (closingBracketIndex < 0 || closingBracketIndex + 1 >= input.Length || input[closingBracketIndex + 1] != '\n')
-                return false;
-
-            delimiter = input.Substring(3, closingBracketIndex - 3);
-            numbersPortion = input.Substring(closingBracketIndex + 2);
-            return true;
-        }
-
-        // Format 2: //{singleChar}\n{numbers}
-        if (input.Length < 4 || input[3] != '\n')
+        var newlineIndex = input.IndexOf('\n');
+        if (newlineIndex < 0)
             return false;
 
-        delimiter = input[2].ToString();
-        numbersPortion = input.Substring(4);
+        var header = input.Substring(2, newlineIndex - 2);
+        numbersPortion = input.Substring(newlineIndex + 1);
+
+        if (string.IsNullOrEmpty(header))
+            return false;
+
+        // Format 1 & 3: //[{delimiter}]...\n{numbers}  (one or many delimiters of any length)
+        if (header.StartsWith("["))
+        {
+            var i = 0;
+            while (i < header.Length)
+            {
+                if (header[i] != '[')
+                    return false;
+
+                var closingBracketIndex = header.IndexOf(']', i + 1);
+                if (closingBracketIndex < 0)
+                    return false;
+
+                var delimiter = header.Substring(i + 1, closingBracketIndex - i - 1);
+                if (delimiter.Length == 0)
+                    return false;
+
+                delimiters.Add(delimiter);
+                i = closingBracketIndex + 1;
+            }
+
+            return delimiters.Count > 0;
+        }
+
+        // Format 2: //{singleChar}\n{numbers} (or any non-bracket header treated as a single delimiter)
+        delimiters.Add(header);
         return true;
     }
 
