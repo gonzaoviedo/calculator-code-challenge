@@ -16,7 +16,7 @@ public class CalculatorUnitTests
     {
         var value = "";
         var result = _calculator.Add(value);
-        Assert.AreEqual("0", result);
+        Assert.AreEqual("0 = 0", result);
     }
 
     [TestMethod]
@@ -24,7 +24,7 @@ public class CalculatorUnitTests
     {
         var value = "20";
         var result = _calculator.Add(value);
-        Assert.AreEqual("20", result);
+        Assert.AreEqual("20 = 20", result);
     }
 
     [TestMethod]
@@ -32,7 +32,7 @@ public class CalculatorUnitTests
     {
         var value = "1,1000";
         var result = _calculator.Add(value);
-        Assert.AreEqual("1001", result);
+        Assert.AreEqual("1+1000 = 1001", result);
     }
 
     [TestMethod]
@@ -58,7 +58,7 @@ public class CalculatorUnitTests
     {
         var value = "1,2,3";
         var result = _calculator.Add(value);
-        Assert.AreEqual("6", result);
+        Assert.AreEqual("1+2+3 = 6", result);
     }
 
     [TestMethod]
@@ -66,7 +66,7 @@ public class CalculatorUnitTests
     {
         var value = "1,2,3,4,5,6,7,8,9,10,11,12";
         var result = _calculator.Add(value);
-        Assert.AreEqual("78", result);
+        Assert.AreEqual("1+2+3+4+5+6+7+8+9+10+11+12 = 78", result);
     }
 
     [TestMethod]
@@ -74,7 +74,7 @@ public class CalculatorUnitTests
     {
         var value = ",5";
         var result = _calculator.Add(value);
-        Assert.AreEqual("5", result);
+        Assert.AreEqual("0+5 = 5", result);
     }
 
     [TestMethod]
@@ -82,7 +82,7 @@ public class CalculatorUnitTests
     {
         var value = "5,";
         var result = _calculator.Add(value);
-        Assert.AreEqual("5", result);
+        Assert.AreEqual("5+0 = 5", result);
     }
 
     [TestMethod]
@@ -90,7 +90,7 @@ public class CalculatorUnitTests
     {
         var value = ",";
         var result = _calculator.Add(value);
-        Assert.AreEqual("0", result);
+        Assert.AreEqual("0+0 = 0", result);
     }
 
     [TestMethod]
@@ -98,7 +98,7 @@ public class CalculatorUnitTests
     {
         var value = "8,asd";
         var result = _calculator.Add(value);
-        Assert.AreEqual("8", result);
+        Assert.AreEqual("8+0 = 8", result);
     }
 
     [TestMethod]
@@ -106,7 +106,7 @@ public class CalculatorUnitTests
     {
         var value = "sdasd,15";
         var result = _calculator.Add(value);
-        Assert.AreEqual("15", result);
+        Assert.AreEqual("0+15 = 15", result);
     }
 
     [TestMethod]
@@ -114,7 +114,7 @@ public class CalculatorUnitTests
     {
         var value = "1\n2,3";
         var result = _calculator.Add(value);
-        Assert.AreEqual("6", result);
+        Assert.AreEqual("1+2+3 = 6", result);
     }
 
     [TestMethod]
@@ -122,7 +122,7 @@ public class CalculatorUnitTests
     {
         var value = "1\n2\n7";
         var result = _calculator.Add(value);
-        Assert.AreEqual("10", result);
+        Assert.AreEqual("1+2+7 = 10", result);
     }
 
     [TestMethod]
@@ -130,7 +130,7 @@ public class CalculatorUnitTests
     {
         var value = "2,1001,6";
         var result = _calculator.Add(value);
-        Assert.AreEqual("8", result);
+        Assert.AreEqual("2+0+6 = 8", result);
     }
 
     [TestMethod]
@@ -138,7 +138,7 @@ public class CalculatorUnitTests
     {
         var value = "1000,1";
         var result = _calculator.Add(value);
-        Assert.AreEqual("1001", result);
+        Assert.AreEqual("1000+1 = 1001", result);
     }
 
     [TestMethod]
@@ -146,7 +146,7 @@ public class CalculatorUnitTests
     {
         var value = "//#\n2#5";
         var result = _calculator.Add(value);
-        Assert.AreEqual("7", result);
+        Assert.AreEqual("2+5 = 7", result);
     }
 
     [TestMethod]
@@ -154,7 +154,7 @@ public class CalculatorUnitTests
     {
         var value = "//,\n2,ff,100";
         var result = _calculator.Add(value);
-        Assert.AreEqual("102", result);
+        Assert.AreEqual("2+0+100 = 102", result);
     }
 
     [TestMethod]
@@ -162,7 +162,7 @@ public class CalculatorUnitTests
     {
         var value = "//;\n1000;2;2000;abc;3";
         var result = _calculator.Add(value);
-        Assert.AreEqual("1005", result);
+        Assert.AreEqual("1000+2+0+0+3 = 1005", result);
     }
 
     [TestMethod]
@@ -178,7 +178,7 @@ public class CalculatorUnitTests
     {
         var value = "//[***]\n11***22***33";
         var result = _calculator.Add(value);
-        Assert.AreEqual("66", result);
+        Assert.AreEqual("11+22+33 = 66", result);
     }
 
     [TestMethod]
@@ -186,7 +186,7 @@ public class CalculatorUnitTests
     {
         var value = "//;\n";
         var result = _calculator.Add(value);
-        Assert.AreEqual("0", result);
+        Assert.AreEqual("0 = 0", result);
     }
 
     [TestMethod]
@@ -194,7 +194,7 @@ public class CalculatorUnitTests
     {
         var value = "//[***]\n1******2"; // tokens: "1", "", "2"
         var result = _calculator.Add(value);
-        Assert.AreEqual("3", result);
+        Assert.AreEqual("1+0+2 = 3", result);
     }
 
     [TestMethod]
@@ -202,7 +202,7 @@ public class CalculatorUnitTests
     {
         var value = "//[.*]\n1.*2.*3";
         var result = _calculator.Add(value);
-        Assert.AreEqual("6", result);
+        Assert.AreEqual("1+2+3 = 6", result);
     }
 
     [TestMethod]
@@ -219,7 +219,7 @@ public class CalculatorUnitTests
     {
         var value = "//[***\n1***2***3"; // header not in valid format, everything becomes invalid tokens
         var result = _calculator.Add(value);
-        Assert.AreEqual("0", result);
+        Assert.AreEqual("0+0 = 0", result);
     }
 
     [TestMethod]
@@ -227,7 +227,7 @@ public class CalculatorUnitTests
     {
         var value = "//;\n1;2,3\n4"; // custom ';' plus default ',' and '\n'
         var result = _calculator.Add(value);
-        Assert.AreEqual("10", result);
+        Assert.AreEqual("1+2+3+4 = 10", result);
     }
 
     [TestMethod]
@@ -235,7 +235,7 @@ public class CalculatorUnitTests
     {
         var value = "//[*][!!][r9r]\n11r9r22*hh*33!!44";
         var result = _calculator.Add(value);
-        Assert.AreEqual("110", result);
+        Assert.AreEqual("11+22+0+33+44 = 110", result);
     }
 
     [TestMethod]
@@ -243,7 +243,7 @@ public class CalculatorUnitTests
     {
         var value = "//[*][!!][r9r][#]\n11r9r22*hh*33!!44#1";
         var result = _calculator.Add(value);
-        Assert.AreEqual("111", result);
+        Assert.AreEqual("11+22+0+33+44+1 = 111", result);
     }
 
     [TestMethod]
@@ -253,5 +253,13 @@ public class CalculatorUnitTests
         var ex = Assert.ThrowsException<ArgumentException>(() => _calculator.Add(value));
         StringAssert.Contains(ex.Message, "-1");
         StringAssert.Contains(ex.Message, "-3");
+    }
+
+    [TestMethod]
+    public void Example_Formula_IncludesZeros_ForInvalidAndLargeValues()
+    {
+        var value = "2,,4,rrrr,1001,6";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("2+0+4+0+0+6 = 12", result);
     }
 }

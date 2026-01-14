@@ -10,7 +10,7 @@ public class Calculator
     public string Add(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
-            return "0";
+            return "0 = 0";
 
         var delimiters = new List<string>(BaseDelimiters);
         var numbersPortion = input;
@@ -22,10 +22,14 @@ public class Calculator
         }
 
         var parts = SplitInput(numbersPortion, delimiters);
-        var (sum, negativeNumbers) = AggregateValues(parts);
-        EnsureNoNegatives(negativeNumbers);
+        var calculation = AggregateValues(parts);
+        EnsureNoNegatives(calculation.Negatives);
 
-        return sum.ToString();
+        if (calculation.Terms.Count == 0)
+            return "0 = 0";
+
+        var formula = string.Join("+", calculation.Terms);
+        return $"{formula} = {calculation.Sum}";
     }
 
     private static bool TryParseCustomDelimiters(string input, out List<string> delimiters, out string numbersPortion)
@@ -81,44 +85,91 @@ public class Calculator
         return Regex.Split(input, pattern);
     }
 
-    private static (int sum, List<int> negatives) AggregateValues(IEnumerable<string> parts)
+    private sealed class CalculationResult
     {
-        var sum = 0;
-        var negatives = new List<int>();
+        public int Sum { get; private set; }
+        public List<int> Terms { get; } = new();
+        public List<int> Negatives { get; } = new();
+
+        public void AddIgnoredTerm()
+        {
+            Terms.Add(0);
+        }
+
+        public void AddNegative(int value)
+        {
+            Negatives.Add(value);
+            Terms.Add(0);
+        }
+
+        public void AddTerm(int value)
+        {
+            Terms.Add(value);
+            Sum += value;
+        }
+    }
+
+    private static CalculationResult AggregateValues(IEnumerable<string> parts)
+    {
+        var result = new CalculationResult();
 
         foreach (var part in parts)
         {
-            if (TryGetValidNumber(part, negatives, out var value))
-            {
-                sum += value;
-            }
+            ProcessToken(part, result);
         }
 
-        return (sum, negatives);
+        return result;
     }
 
-    private static bool TryGetValidNumber(string part, List<int> negatives, out int value)
+    private enum TokenClassification
+    {
+        Ignored,
+        Negative,
+        Valid
+    }
+
+    private static void ProcessToken(string part, CalculationResult result)
+    {
+        var classification = ClassifyToken(part, out var value);
+
+        switch (classification)
+        {
+            case TokenClassification.Ignored:
+                result.AddIgnoredTerm();
+                break;
+
+            case TokenClassification.Negative:
+                result.AddNegative(value);
+                break;
+
+            case TokenClassification.Valid:
+                result.AddTerm(value);
+                break;
+        }
+    }
+
+    private static TokenClassification ClassifyToken(string part, out int value)
     {
         value = 0;
         var trimmed = part.Trim();
 
         if (string.IsNullOrEmpty(trimmed))
-            return false; // missing number treated as 0
+            return TokenClassification.Ignored; // missing number treated as 0
 
         if (!int.TryParse(trimmed, out var parsed))
-            return false; // invalid numbers are ignored (treated as 0)
+            return TokenClassification.Ignored; // invalid numbers are treated as 0
 
         if (parsed < 0)
         {
-            negatives.Add(parsed);
-            return false;
+            value = parsed;
+            return TokenClassification.Negative; // negative numbers contribute 0 (but will cause exception)
         }
 
         if (parsed > MaxPossibleValueToAdd)
-            return false; // values larger than max threshold are ignored
+            return TokenClassification.Ignored; // numbers greater than max threshold are treated as 0
 
         value = parsed;
-        return true;
+        return TokenClassification.Valid;
     }
 
     private static void EnsureNoNegatives(List<int> negativeNumbers)
