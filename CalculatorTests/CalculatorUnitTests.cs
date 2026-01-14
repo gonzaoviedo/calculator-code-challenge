@@ -30,9 +30,9 @@ public class CalculatorUnitTests
     [TestMethod]
     public void TwoNumbers_ReturnsSum()
     {
-        var value = "1,5000";
+        var value = "1,1000";
         var result = _calculator.Add(value);
-        Assert.AreEqual("5001", result);
+        Assert.AreEqual("1001", result);
     }
 
     [TestMethod]
@@ -123,5 +123,21 @@ public class CalculatorUnitTests
         var value = "1\n2\n7";
         var result = _calculator.Add(value);
         Assert.AreEqual("10", result);
+    }
+
+    [TestMethod]
+    public void NumbersGreaterThanThousand_AreIgnored()
+    {
+        var value = "2,1001,6";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("8", result);
+    }
+
+    [TestMethod]
+    public void Thousand_IsIncludedInSum()
+    {
+        var value = "1000,1";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("1001", result);
     }
 }
