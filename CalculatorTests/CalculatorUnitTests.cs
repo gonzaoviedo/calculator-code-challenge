@@ -140,4 +140,36 @@ public class CalculatorUnitTests
         var result = _calculator.Add(value);
         Assert.AreEqual("1001", result);
     }
+
+    [TestMethod]
+    public void CustomSingleCharacterDelimiter_IsSupported()
+    {
+        var value = "//#\n2#5";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("7", result);
+    }
+
+    [TestMethod]
+    public void CustomDelimiter_Comma_UsesSameRules()
+    {
+        var value = "//,\n2,ff,100";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("102", result);
+    }
+
+    [TestMethod]
+    public void CustomDelimiter_Semicolon_WithLargeAndInvalidValues()
+    {
+        var value = "//;\n1000;2;2000;abc;3";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("1005", result);
+    }
+
+    [TestMethod]
+    public void CustomDelimiter_Asterisk_WithNegative_ThrowsAndListsNegative()
+    {
+        var value = "//*\n1*2*-4*1001";
+        var ex = Assert.ThrowsException<ArgumentException>(() => _calculator.Add(value));
+        StringAssert.Contains(ex.Message, "-4");
+    }
 }

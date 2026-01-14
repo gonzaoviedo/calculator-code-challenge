@@ -2,7 +2,7 @@ namespace Calculator;
 
 public class Calculator
 {
-    private static readonly char[] Delimiters = [',', '\n'];
+    private static readonly char[] BaseDelimiters = [',', '\n'];
     const int MaxPossibleValueToAdd = 1000;
 
     public string Add(string input)
@@ -10,16 +10,42 @@ public class Calculator
         if (string.IsNullOrWhiteSpace(input))
             return "0";
 
-        var parts = SplitInput(input);
+        var delimiters = new List<char>(BaseDelimiters);
+        var numbersPortion = input;
+
+        if (TryParseCustomDelimiter(input, out var customDelimiter, out var withoutHeader))
+        {
+            delimiters.Add(customDelimiter);
+            numbersPortion = withoutHeader;
+        }
+
+        var parts = SplitInput(numbersPortion, delimiters);
         var (sum, negativeNumbers) = AggregateValues(parts);
         EnsureNoNegatives(negativeNumbers);
 
         return sum.ToString();
     }
 
-    private static IEnumerable<string> SplitInput(string input)
+    private static bool TryParseCustomDelimiter(string input, out char delimiter, out string numbersPortion)
     {
-        return input.Split(Delimiters);
+        delimiter = default;
+        numbersPortion = input;
+
+        if (!input.StartsWith("//"))
+            return false;
+
+        // Expected format: //{delimiter}\n{numbers}
+        if (input.Length < 4 || input[3] != '\n')
+            return false;
+
+        delimiter = input[2];
+        numbersPortion = input.Substring(4);
+        return true;
+    }
+
+    private static IEnumerable<string> SplitInput(string input, IEnumerable<char> delimiters)
+    {
+        return input.Split(delimiters.ToArray());
     }
 
     private static (int sum, List<int> negatives) AggregateValues(IEnumerable<string> parts)
