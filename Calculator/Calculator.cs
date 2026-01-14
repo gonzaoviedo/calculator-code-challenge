@@ -7,7 +7,8 @@ public class Calculator
         if (string.IsNullOrWhiteSpace(input))
             return "0";
 
-        var parts = input.Split(',');
+        // Supporting both comma and newline as delimiters
+        var parts = input.Split(',', '\n');
 
         var sum = 0;
 
@@ -20,7 +21,7 @@ public class Calculator
 
             if (int.TryParse(trimmed, out var value))
                 sum += value; // valid number
-            // invalid numbers are treated as 0 (ignored)
+            // invalid numbers are ignored
         }
 
         return sum.ToString();

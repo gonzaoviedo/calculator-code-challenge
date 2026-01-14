@@ -98,4 +98,20 @@ public class CalculatorUnitTests
         var result = _calculator.Add(value);
         Assert.AreEqual("15", result);
     }
+
+    [TestMethod]
+    public void NewLine_AsAlternativeDelimiter_WorksWithCommas()
+    {
+        var value = "1\n2,3";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("6", result);
+    }
+
+    [TestMethod]
+    public void NewLine_AsDelimiter_WorksWithCommas()
+    {
+        var value = "1\n2\n7";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("10", result);
+    }
 }
