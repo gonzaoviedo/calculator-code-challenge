@@ -1,16 +1,18 @@
+using System.Text.RegularExpressions;
+
 namespace Calculator;
 
 public class Calculator
 {
-    private static readonly char[] BaseDelimiters = [',', '\n'];
-    const int MaxPossibleValueToAdd = 1000;
+    private static readonly string[] BaseDelimiters = [",", "\n"];
+    private const int MaxPossibleValueToAdd = 1000;
 
     public string Add(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
             return "0";
 
-        var delimiters = new List<char>(BaseDelimiters);
+        var delimiters = new List<string>(BaseDelimiters);
         var numbersPortion = input;
 
         if (TryParseCustomDelimiter(input, out var customDelimiter, out var withoutHeader))
@@ -26,26 +28,39 @@ public class Calculator
         return sum.ToString();
     }
 
-    private static bool TryParseCustomDelimiter(string input, out char delimiter, out string numbersPortion)
+    private static bool TryParseCustomDelimiter(string input, out string delimiter, out string numbersPortion)
     {
-        delimiter = default;
+        delimiter = string.Empty;
         numbersPortion = input;
 
         if (!input.StartsWith("//"))
             return false;
 
-        // Expected format: //{delimiter}\n{numbers}
+        // Format 1: //[{delimiter}]\n{numbers}  (delimiter of any length)
+        if (input.StartsWith("//["))
+        {
+            var closingBracketIndex = input.IndexOf(']', 3);
+            if (closingBracketIndex < 0 || closingBracketIndex + 1 >= input.Length || input[closingBracketIndex + 1] != '\n')
+                return false;
+
+            delimiter = input.Substring(3, closingBracketIndex - 3);
+            numbersPortion = input.Substring(closingBracketIndex + 2);
+            return true;
+        }
+
+        // Format 2: //{singleChar}\n{numbers}
         if (input.Length < 4 || input[3] != '\n')
             return false;
 
-        delimiter = input[2];
+        delimiter = input[2].ToString();
         numbersPortion = input.Substring(4);
         return true;
     }
 
-    private static IEnumerable<string> SplitInput(string input, IEnumerable<char> delimiters)
+    private static IEnumerable<string> SplitInput(string input, IEnumerable<string> delimiters)
     {
-        return input.Split(delimiters.ToArray());
+        var pattern = string.Join("|", delimiters.Select(Regex.Escape));
+        return Regex.Split(input, pattern);
     }
 
     private static (int sum, List<int> negatives) AggregateValues(IEnumerable<string> parts)

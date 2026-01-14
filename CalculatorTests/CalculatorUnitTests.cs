@@ -172,4 +172,61 @@ public class CalculatorUnitTests
         var ex = Assert.ThrowsException<ArgumentException>(() => _calculator.Add(value));
         StringAssert.Contains(ex.Message, "-4");
     }
+
+    [TestMethod]
+    public void CustomDelimiter_AnyLength_IsSupported()
+    {
+        var value = "//[***]\n11***22***33";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("66", result);
+    }
+
+    [TestMethod]
+    public void CustomSingleCharDelimiter_WithNoNumbers_ReturnsZero()
+    {
+        var value = "//;\n";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("0", result);
+    }
+
+    [TestMethod]
+    public void CustomDelimiter_AnyLength_ConsecutiveDelimiters_IgnoredAsZero()
+    {
+        var value = "//[***]\n1******2"; // tokens: "1", "", "2"
+        var result = _calculator.Add(value);
+        Assert.AreEqual("3", result);
+    }
+
+    [TestMethod]
+    public void CustomDelimiter_AnyLength_WithRegexSpecialChars_Works()
+    {
+        var value = "//[.*]\n1.*2.*3";
+        var result = _calculator.Add(value);
+        Assert.AreEqual("6", result);
+    }
+
+    [TestMethod]
+    public void CustomDelimiter_AnyLength_WithNegatives_ThrowsAndListsAll()
+    {
+        var value = "//[***]\n-1***2***-3";
+        var ex = Assert.ThrowsException<ArgumentException>(() => _calculator.Add(value));
+        StringAssert.Contains(ex.Message, "-1");
+        StringAssert.Contains(ex.Message, "-3");
+    }
+
+    [TestMethod]
+    public void CustomDelimiter_MalformedHeader_MissingClosingBracket_TreatedAsNoNumbers()
+    {
+        var value = "//[***\n1***2***3"; // header not in valid format, everything becomes invalid tokens
+        var result = _calculator.Add(value);
+        Assert.AreEqual("0", result);
+    }
+
+    [TestMethod]
+    public void CustomDelimiter_WithDefaultDelimiters_AllApply()
+    {
+        var value = "//;\n1;2,3\n4"; // custom ';' plus default ',' and '\n'
+        var result = _calculator.Add(value);
+        Assert.AreEqual("10", result);
+    }
 }
